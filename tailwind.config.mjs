@@ -8,8 +8,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        background: "#282c34", // Fondo principal
+        foreground: "#abb2bf", // Texto primario
+        primary: "#61afef",    // Azul (resaltado)
+        secondary: "#e06c75",  // Rojo
+        accent: "#98c379",     // Verde
+        muted: "#5c6370",      // Gris apagado
+        border: "#3e4451",     // Bordes
+        link: "#61afef",       // Enlaces
+        warning: "#d19a66",    // Amarillo (alertas)
+        error: "#be5046",      // Error (rojo más oscuro)
       },
     },
   },
