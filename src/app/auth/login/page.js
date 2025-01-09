@@ -2,7 +2,7 @@
 import { set, useForm } from "react-hook-form";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 function LoginPage() {
@@ -11,6 +11,16 @@ function LoginPage() {
     const router = useRouter();
     const [error, setError] = useState(null); // Corregido
 
+    useEffect(() => {
+      // Deshabilitar el scroll en la página
+      document.body.style.overflow = 'hidden';
+  
+      // Restaurar el scroll cuando el componente se desmonte o cambie
+      return () => {
+        document.body.style.overflow = 'auto';
+      };
+    }, []);
+
     const onSubmit = handleSubmit (async (data) => {
       console.log(data);
       const res = await signIn("credentials", {
@@ -18,6 +28,7 @@ function LoginPage() {
         password: data.password,
         redirect: false
     });
+
 
     if(res.error) {
       setError(res.error);
@@ -29,13 +40,10 @@ function LoginPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100 p-8 sm:p-20 font-sans flex items-center justify-center">
+    <div className="min-h-screen bg-[#0d1117] text-gray-100 p-8 sm:p-20 font-sans flex items-center justify-center">
       <title>LnKut | Shorten Your URLs</title>
 
       <div className="w-full max-w-lg">
-        <header className="flex justify-between items-center mb-12">
-          <h1 className="text-4xl font-extrabold text-white">LnKut</h1>
-        </header>
 
         <div className="bg-gray-800 p-8 rounded-md shadow-lg">
           <form onSubmit={onSubmit} className="flex flex-col gap-4">
@@ -45,6 +53,7 @@ function LoginPage() {
                 <span className="text-red-500 text-sm">{error}</span>
               )}
               <input
+              
                 type="email"
                 {...register("email", {
                   required: { value: true, message: "Email is required" },
@@ -54,7 +63,7 @@ function LoginPage() {
                   },
                 })}
                 placeholder="user@mail.com"
-                className="text-black w-full p-2 border border-gray-300 rounded mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="p-2 w-full mt-1 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {errors.email && (
                 <span className="text-red-500 text-sm">
@@ -69,7 +78,7 @@ function LoginPage() {
                   required: { value: true, message: "Password is required" },
                 })}
                 placeholder="********"
-                className="text-black w-full p-2 border border-gray-300 rounded mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="p-2 w-full mt-1 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {errors.password && (
                 <span className="text-red-500 text-sm">
@@ -79,19 +88,19 @@ function LoginPage() {
             </div>
             <button
               type="submit"
-              className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200"
+              className="w-full p-2 bg-[#238636] text-white rounded-md hover:bg-[#2ea043] transition-colors"
             >
               Login
             </button>
             <div className="flex justify-between mt-4">
               <p className="text-sm text-gray-400 mt-4">
                 Dont have an account?{" "}
-                <Link href="/auth/register" className="text-blue-500 hover:underline">
+                <Link href="/auth/register" className="text-[#238636] hover:underline">
                   Register
                 </Link>
               </p>
               <p className="text-sm text-gray-400 mt-4">
-                <Link href="/" className="text-blue-500 hover:underline">
+                <Link href="/" className="text-[#238636] hover:underline">
                   Go to Home
                 </Link>
               </p>

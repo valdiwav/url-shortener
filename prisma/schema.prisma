@@ -35,8 +35,8 @@ model Link {
   password        String? // Contraseña opcional para proteger el enlace
   expirationDate  DateTime? // Fecha de expiración opcional
   createdAt       DateTime    @default(now())
-  userId          String? // Relación con el usuario
-  user            User?       @relation(fields: [userId], references: [id])
+  userId          String // Relación con el usuario
+  user            User       @relation(fields: [userId], references: [id])
   statistics      Statistic[] // Relación con las estadísticas de acceso
 }
 

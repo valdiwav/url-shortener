@@ -1,13 +1,23 @@
 "use client"; // Indica que este archivo es un Client Component
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 function RegisterPage() {
     const { register, handleSubmit, watch, formState: { errors } } = useForm();
     const router = useRouter();
     const [serverError, setServerError] = useState("");
+
+    useEffect(() => {
+        // Deshabilitar el scroll en la página
+        document.body.style.overflow = 'hidden';
+    
+        // Restaurar el scroll cuando el componente se desmonte o cambie
+        return () => {
+          document.body.style.overflow = 'auto';
+        };
+      }, []);
 
     const onSubmit = handleSubmit(async (data) => {
         setServerError(""); // Limpia errores previos
@@ -28,13 +38,10 @@ function RegisterPage() {
     });
 
     return (
-        <div className="min-h-screen bg-gray-900 text-gray-100 p-8 sm:p-20 font-sans flex items-center justify-center">
+        <div className="min-h-screen bg-[#0d1117] text-gray-100 p-8 sm:p-20 font-sans flex items-center justify-center">
             <title>LnKut | Shorten Your URLs</title>
 
             <div className="w-full max-w-lg">
-                <header className="flex justify-between items-center mb-12">
-                    <h1 className="text-4xl font-extrabold text-white">LnKut</h1>
-                </header>
 
                 <div className="bg-gray-800 p-8 rounded-md shadow-lg">
                     <form onSubmit={onSubmit} className="flex flex-col gap-4">
@@ -94,15 +101,15 @@ function RegisterPage() {
                         />
                         {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword.message}</p>}
 
-                        <button className="p-2 rounded bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-white font-semibold">
+                        <button className="p-2 rounded bg-[#238636] text-white rounded-md hover:bg-[#2ea043] transition-colors">
                             Register
                         </button>
                         <div className="flex justify-between mt-4">
                             <p className="text-sm text-gray-400">
-                                Already have an account? <Link href="/auth/login" className="text-blue-500 hover:underline">Login</Link>
+                                Already have an account? <Link href="/auth/login" className="text-[#238636] hover:underline">Login</Link>
                             </p>
                             <p className="text-sm text-gray-400">
-                                <Link href="/" className="text-blue-500 hover:underline">Go to Home</Link>
+                                <Link href="/" className="text-[#238636] hover:underline">Go to Home</Link>
                             </p>
                         </div>
                     </form>

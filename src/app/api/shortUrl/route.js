@@ -1,6 +1,9 @@
 // src/app/api/shortUrl/route.js
 import { PrismaClient } from "@prisma/client";
 import { generateQRCodeBase64 } from "../../components/qrCodeGenerator"; // Ajusta la ruta según tu estructura
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { getServerSession } from "next-auth/next";
+
 
 const prisma = new PrismaClient();
 
@@ -8,6 +11,7 @@ export async function POST(req) {
   try {
     const body = await req.json();
     const { url } = body;
+    const session = await getServerSession(authOptions);
 
     // Validar que la URL exista
     if (!url) {
@@ -44,6 +48,20 @@ export async function POST(req) {
       if (!existing) isUnique = true;
     }
 
+    if (!session || !session.user || !session.user.email) {
+      throw new Error("El usuario no está autenticado o no se pudo obtener el email.");
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+    });
+
+    if (!user) {
+      throw new Error("Usuario no encontrado en la base de datos.");
+    }
+    const userId = user.id;
+
+
     const baseUrl = process.env.BASE_URL || "http://localhost:3000";
     const fullShortUrl = `${baseUrl}/${shortUrl}`;
 
@@ -57,6 +75,7 @@ export async function POST(req) {
         shortUrl,
         qrCode, // Guardar el QR generado en Base64
         qrCodeGenerated: true,
+        userId, // Guardar el ID del usuario autenticado
       },
     });
 

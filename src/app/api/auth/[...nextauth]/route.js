@@ -35,6 +35,18 @@ const authOptions = {
             
         })
     ],
+    callbacks: {
+        async session({ session, token }) {
+          session.user.id = token.id; // Agrega el ID al objeto de sesión
+          return session;
+        },
+        async jwt({ token, user }) {
+          if (user) {
+            token.id = user.id; // Guarda el ID en el token
+          }
+          return token;
+        },
+    },
     pages: {
       signIn: "/auth/login",
     },

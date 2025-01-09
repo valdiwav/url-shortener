@@ -1,14 +1,21 @@
 "use client"; // Esto convierte el componente en un Client Component
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import Image from 'next/image';
 
 export default function Home() {
   const inputRef = useRef();
   const [shortURL, setShortURL] = useState('');
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Estado de sesión inicializado aquí
   const [qrCode, setQrCode] = useState('');
 
+  useEffect(() => {
+    // Deshabilitar el scroll en la página
+    document.body.style.overflow = 'hidden';
 
+    // Restaurar el scroll cuando el componente se desmonte o cambie
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -26,18 +33,9 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100 p-8 sm:p-20 font-sans">
+    <div className="min-h-screen bg-[#0d1117] text-gray-100 p-8 sm:p-20 font-sans">
       <title>LnKut | Shorten Your URLs</title>
 
-      <header className="flex justify-between items-center mb-12">
-        <h1 className="text-4xl font-extrabold text-white">LnKut</h1>
-        <button
-          onClick={() => window.location.href = '/auth/login'}
-          className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 transition-colors"
-        >
-          {isLoggedIn ? "Log out" : "Log in"}
-        </button>
-      </header>
 
       <main className="flex flex-col gap-12 items-center">
         {/* Descripción Principal */}
@@ -63,7 +61,7 @@ export default function Home() {
           />
           <button
             type="submit"
-            className="p-4 bg-blue-600 text-white rounded-md hover:bg-blue-500 transition-colors"
+            className="p-4 bg-[#238636] text-white rounded-md hover:bg-[#2ea043] transition-colors"
           >
             Shorten URL
           </button>
@@ -97,7 +95,7 @@ export default function Home() {
         <section className="w-full max-w-lg bg-gray-800 p-8 rounded-md border border-gray-700">
           <h3 className="text-2xl font-bold mb-4 text-white">Customize Your Link </h3>
           <p className="text-gray-400 mb-6">
-          Personalize your links with aliases or your own domain. <br/><span className="text-blue-400">Soon!</span>
+          Personalize your links with aliases or your own domain. <br/><span className="text-[#238636]">Soon!</span>
           </p>
           <form className="flex flex-col gap-4">
             <input
