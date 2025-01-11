@@ -2,12 +2,13 @@
 import { MdOutlineDashboard } from "react-icons/md";
 import { FaLink, FaGithub, FaLinkedin } from "react-icons/fa6";
 import { IoSettingsOutline } from "react-icons/io5";
+import Link from "next/link";
 
 const options = {
   General: [
-    { name: "Dashboard", icon: <MdOutlineDashboard /> },
-    { name: "URLs", icon: <FaLink /> },
-    { name: "Settings", icon: <IoSettingsOutline /> },
+    { name: "Dashboard", icon: <MdOutlineDashboard />, href: "/dashboard/links" },
+    { name: "Links", icon: <FaLink />, href: "/dashboard/links" },
+    { name: "Settings", icon: <IoSettingsOutline />, href: "/dashboard/settings" },
   ],
   Social: [
     { name: "GitHub", icon: <FaGithub />, link: "https://github.com" },
@@ -15,7 +16,7 @@ const options = {
   ],
 };
 
-export default function MenuOptions({ searchText }) {
+export default function MenuOptions({ searchText, onClose }) {
   const filteredOptions = Object.keys(options).reduce((acc, section) => {
     const filteredItems = options[section].filter((item) =>
       !searchText || item.name.toLowerCase().includes(searchText.toLowerCase())
@@ -36,19 +37,23 @@ export default function MenuOptions({ searchText }) {
               <li
                 key={index}
                 className="p-2 rounded-md cursor-pointer transition-colors duration-300 text-[#8b949e] hover:text-[#f0f6fc] hover:bg-[#21262d] flex items-center gap-2"
+                onClick={onClose} // Cierra el modal en cualquier clic
               >
-                {item.icon}
-                {item.link ? (
+                {item.href ? (
+                  <Link href={item.href} className="flex items-center gap-2 w-full h-full">
+                    {item.icon}
+                    <span>{item.name}</span>
+                  </Link>
+                ) : (
                   <a
                     href={item.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-inherit"
+                    className="flex items-center gap-2 w-full h-full"
                   >
-                    {item.name}
+                    {item.icon}
+                    <span>{item.name}</span>
                   </a>
-                ) : (
-                  item.name
                 )}
               </li>
             ))}

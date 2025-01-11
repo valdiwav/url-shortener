@@ -13,7 +13,7 @@ export default function Header({ isLoggedIn, toggleSearch }) {
           LnKut
         </Link>
         <span className="ml-2 bg-[#238636] text-xs font-semibold py-1 px-2 rounded-full uppercase">
-          Beta
+          Alfa
         </span>
       </div>
 

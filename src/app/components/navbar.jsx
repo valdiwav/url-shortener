@@ -34,7 +34,8 @@ export default function Navbar() {
           setSearchText={setSearchText}
           toggleSearch={toggleSearch}
         >
-          <MenuOptions searchText={searchText} />
+          {/* Pasa toggleSearch a MenuOptions */}
+          <MenuOptions searchText={searchText} onClose={toggleSearch} />
         </SearchModal>
       )}
     </>

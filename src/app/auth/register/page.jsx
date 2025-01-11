@@ -101,7 +101,7 @@ function RegisterPage() {
                         />
                         {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword.message}</p>}
 
-                        <button className="p-2 rounded bg-[#238636] text-white rounded-md hover:bg-[#2ea043] transition-colors">
+                        <button className="p-2  bg-[#238636] text-white rounded-md hover:bg-[#2ea043] transition-colors">
                             Register
                         </button>
                         <div className="flex justify-between mt-4">
