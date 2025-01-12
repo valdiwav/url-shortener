@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 
-export default function ShortUrlModal({ isOpen, onClose }) {
+export default function ShortUrlModal({ isOpen, onClose, onLinkCreated }) {
   const inputRef = useRef();
   const [shortURL, setShortURL] = useState("");
   const [qrCode, setQrCode] = useState("");
@@ -25,10 +25,12 @@ export default function ShortUrlModal({ isOpen, onClose }) {
 
       const data = await res.json();
       if (res.ok) {
-        setShortURL(data.shortUrl);
-        setQrCode(data.qrCode);
-        setError(null);
-      } else {
+        onLinkCreated(data); // Notifica al componente padre
+        setShortURL("");
+        setQrCode("");
+        onClose(); // Cierra el modal
+      }
+       else {
         setError(data.error || "An error occurred");
       }
     } catch (err) {

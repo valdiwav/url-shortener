@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { MdOutlineSignalCellularAlt } from "react-icons/md";
 import { LuCopy } from "react-icons/lu";
@@ -9,10 +9,19 @@ import { FaRegTrashAlt } from "react-icons/fa";
 import Modal from "./modal";
 import ConfirmDeleteModal from "./deleteModal";
 
-export default function LinksList({ links, handleCopy, setQrModal, handleDeleteLink }) {
+export default function LinksList({
+  links,
+  handleCopy,
+  setQrModal,
+  handleDeleteLink,
+}) {
+
   const [showModal, setShowModal] = useState(null);
   const [deleteModalIndex, setDeleteModalIndex] = useState(null);
   const modalRef = useRef();
+
+  // Función para obtener los enlaces del servidor
+   // Solo se ejecuta una vez al montar el componente
 
   const formatDate = (dbDate) => {
     const date = new Date(dbDate);
@@ -22,6 +31,8 @@ export default function LinksList({ links, handleCopy, setQrModal, handleDeleteL
       year: "numeric",
     });
   };
+
+
 
   return (
     <ul className="grid grid-cols-2 gap-4">
@@ -95,7 +106,7 @@ export default function LinksList({ links, handleCopy, setQrModal, handleDeleteL
             <ConfirmDeleteModal
               shortUrl={link.shortUrl}
               onConfirm={() => {
-                handleDeleteLink(link.id); // Pasa el ID del enlace a la función de eliminación
+                handleDeleteLink(link.shortUrl);
                 setDeleteModalIndex(null);
               }}
               onCancel={() => setDeleteModalIndex(null)}
