@@ -1,11 +1,12 @@
 // src/app/api/shortUrl/route.js
 import { PrismaClient } from "@prisma/client";
 import { generateQRCodeBase64 } from "../../components/qrCodeGenerator"; // Ajusta la ruta según tu estructura
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "../auth/[...nextauth]/route";
 import { getServerSession } from "next-auth/next";
 
 
 const prisma = new PrismaClient();
+
 
 export async function POST(req) {
   try {
@@ -75,6 +76,7 @@ export async function POST(req) {
         shortUrl,
         qrCode, // Guardar el QR generado en Base64
         qrCodeGenerated: true,
+        newLink: fullShortUrl,
         userId, // Guardar el ID del usuario autenticado
       },
     });
@@ -83,6 +85,7 @@ export async function POST(req) {
       JSON.stringify({
         originalUrl: savedUrl.url,
         shortUrl: fullShortUrl,
+        newLink: savedUrl.newLink,
         qrCode: savedUrl.qrCode, // Enviar el QR generado al cliente
       }),
       { status: 201 }

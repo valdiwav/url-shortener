@@ -25,7 +25,11 @@ export default function Navbar() {
   return (
     <>
       <nav className="bg-[#0d1117] p-4 flex justify-between items-center text-white">
-        <Header isLoggedIn={isLoggedIn} toggleSearch={toggleSearch} />
+        <Header 
+        isLoggedIn={isLoggedIn} 
+        toggleSearch={toggleSearch} 
+        userName={isLoggedIn && session?.user?.name ? session.user.name : ""}
+        email={isLoggedIn && session?.user?.email ? session.user.email : ""}/>
       </nav>
 
       {isSearchOpen && (

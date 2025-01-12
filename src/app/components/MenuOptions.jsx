@@ -1,5 +1,7 @@
 "use client";
 import { MdOutlineDashboard } from "react-icons/md";
+import { HiOutlineHome } from "react-icons/hi";
+import { MdLogout } from "react-icons/md";
 import { FaLink, FaGithub, FaLinkedin } from "react-icons/fa6";
 import { IoSettingsOutline } from "react-icons/io5";
 import Link from "next/link";
@@ -29,14 +31,14 @@ export default function MenuOptions({ searchText, onClose }) {
     <>
       {Object.keys(filteredOptions).map((section) => (
         <div key={section} className="mb-4">
-          <h3 className="font-semibold text-sm mb-2 text-[#8b949e]">
+          <h3 className="truncate font-mono font-semibold text-sm mb-2 text-[#8b949e]">
             {section}
           </h3>
           <ul>
             {filteredOptions[section].map((item, index) => (
               <li
                 key={index}
-                className="p-2 rounded-md cursor-pointer transition-colors duration-300 text-[#8b949e] hover:text-[#f0f6fc] hover:bg-[#21262d] flex items-center gap-2"
+                className="truncate font-mono p-2 rounded-md cursor-pointer transition-colors duration-300 text-[#8b949e] hover:text-[#f0f6fc] hover:bg-[#21262d] flex items-center gap-2"
                 onClick={onClose} // Cierra el modal en cualquier clic
               >
                 {item.href ? (

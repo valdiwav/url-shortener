@@ -17,16 +17,6 @@ export async function POST(request){
             return NextResponse.json({message: "Email already exists"}, {status: 400});
         }
     
-        const usernameFound = await db.user.findUnique({
-            where: {
-                username: data.username
-            }
-        })
-    
-        if(usernameFound){
-            return NextResponse.json({message: "Username already exists"}, {status: 400});
-        }
-    
         console.log(data);
     
         // Contraseña encriptada
@@ -34,7 +24,7 @@ export async function POST(request){
     
         const newUser = await db.user.create({
             data: {
-                username: data.username,
+                name: data.name,
                 email: data.email,
                 password: hashedPassword
             }

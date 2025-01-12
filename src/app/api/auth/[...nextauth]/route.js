@@ -3,7 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import db from '../../../libs/db'
 import bcrypt from 'bcrypt'
 
-const authOptions = {
+export const authOptions = {
     providers:[
         CredentialsProvider({
             name: 'Credentials',
@@ -28,7 +28,7 @@ const authOptions = {
                 if(!matchPassword) throw new Error('Wrong password') 
                 return {
                     id: userFound.id,
-                    name: userFound.username,
+                    name: userFound.name,
                     email: userFound.email
                 }
             }

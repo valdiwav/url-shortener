@@ -4,9 +4,19 @@ export default {
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/dashboard/links/components/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
+      keyframes: {
+        slideIn: {
+          "0%": { transform: "translateX(-100%)", opacity: "0" },
+          "100%": { transform: "translateX(0)", opacity: "1" },
+        },
+      },
+      animation: {
+        "slide-in": "slideIn 0.5s ease-in-out",
+      },
       colors: {
         background: "#282c34", // Fondo principal
         foreground: "#abb2bf", // Texto primario
@@ -19,6 +29,7 @@ export default {
         warning: "#d19a66",    // Amarillo (alertas)
         error: "#be5046",      // Error (rojo más oscuro)
       },
+      
     },
   },
   plugins: [

@@ -9,7 +9,7 @@ export default function DashboardLayout({ children }) {
     const pathname = usePathname(); // Obtiene la ruta actual
 
     return (
-        <div>
+        <div className="truncate font-mono">
             <nav className="bg-[#0d1117] flex border-b border-gray-600">
                 <Link href="/dashboard/links">
                     <div

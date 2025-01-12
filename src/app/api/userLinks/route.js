@@ -32,6 +32,7 @@ export async function GET(req) {
         shortUrl: true,
         createdAt: true,
         qrCode: true,
+        visits: true,
       },
       orderBy: {
         createdAt: "desc",

@@ -1,15 +1,17 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
 import { MdOutlineSignalCellularAlt } from "react-icons/md";
 import { LuCopy } from "react-icons/lu";
 import { IoSettingsOutline } from "react-icons/io5";
 import { FaRegTrashAlt } from "react-icons/fa";
 import Modal from "./modal";
+import ConfirmDeleteModal from "./deleteModal";
 
-export default function LinksList({ links, handleCopy, setQrModal }) {
+export default function LinksList({ links, handleCopy, setQrModal, handleDeleteLink }) {
   const [showModal, setShowModal] = useState(null);
+  const [deleteModalIndex, setDeleteModalIndex] = useState(null);
   const modalRef = useRef();
 
   const formatDate = (dbDate) => {
@@ -39,15 +41,18 @@ export default function LinksList({ links, handleCopy, setQrModal }) {
                 {link.shortUrl}
               </a>
             </Link>
-            <div className="flex space-x-4 text-neutral-500 dark:text-neutral-400 relative">
+            <div className="flex space-x-4 text-neutral-100 dark:text-neutral-100 relative">
               <button className="flex items-center">
                 <MdOutlineSignalCellularAlt className="text-base" />
+                <span className="ml-1 text-sm tracking-wide truncate font-mono font-bold">
+                  {link.visits}
+                </span>
                 <span className="ml-1 text-sm tracking-wide truncate font-mono font-bold">
                   clicks
                 </span>
               </button>
               <button
-                className="flex items-center cursor-pointer hover:text-gray-200"
+                className="flex items-center cursor-pointer hover:text-gray-700"
                 onClick={() => setShowModal(showModal === index ? null : index)}
               >
                 <LuCopy className="text-base" />
@@ -60,10 +65,13 @@ export default function LinksList({ links, handleCopy, setQrModal }) {
                   closeModal={() => setShowModal(null)} // Pasa la función para cerrar el modal
                 />
               )}
-              <button className="flex items-center cursor-pointer hover:text-gray-200">
+              <button className="flex items-center cursor-pointer hover:text-gray-700">
                 <IoSettingsOutline className="text-base" />
               </button>
-              <button className="flex items-center cursor-pointer hover:text-gray-200">
+              <button
+                className="flex items-center cursor-pointer hover:text-red-700"
+                onClick={() => setDeleteModalIndex(index)}
+              >
                 <FaRegTrashAlt className="text-base flex items-center" />
               </button>
             </div>
@@ -73,8 +81,9 @@ export default function LinksList({ links, handleCopy, setQrModal }) {
               className="truncate font-mono font-bold text-sm text-neutral-500 dark:text-neutral-400 cursor-pointer hover:text-gray-200 mt-1"
               target="_blank"
               rel="noopener noreferrer"
+              title={link.url}
             >
-              {link.url}
+              {link.url.length > 45 ? `${link.url.slice(0, 45)}...` : link.url}
             </a>
           </Link>
           <div className="flex justify-end mt-0.5">
@@ -82,6 +91,16 @@ export default function LinksList({ links, handleCopy, setQrModal }) {
               {formatDate(link.createdAt)}
             </p>
           </div>
+          {deleteModalIndex === index && (
+            <ConfirmDeleteModal
+              shortUrl={link.shortUrl}
+              onConfirm={() => {
+                handleDeleteLink(link.id); // Pasa el ID del enlace a la función de eliminación
+                setDeleteModalIndex(null);
+              }}
+              onCancel={() => setDeleteModalIndex(null)}
+            />
+          )}
         </li>
       ))}
     </ul>

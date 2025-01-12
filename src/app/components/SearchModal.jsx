@@ -7,7 +7,7 @@ export default function SearchModal({
   children,
 }) {
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
+    <div className="truncate font-mono fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
       <div className="bg-[#0d1117] text-white p-4 ring-1 ring-[#262626] rounded-lg shadow-lg w-[550px] max-h-[350px] relative flex flex-col">
         {/* Botón cerrar */}
         <button

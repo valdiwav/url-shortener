@@ -53,13 +53,13 @@ function RegisterPage() {
                         <input 
                             className="p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" 
                             type="text" 
-                            placeholder="Username" 
-                            {...register("username", { 
-                                required: { value: true, message: "Username is required" },
-                                minLength: { value: 3, message: "Username must be at least 3 characters" }
+                            placeholder="name" 
+                            {...register("name", { 
+                                required: { value: true, message: "name is required" },
+                                minLength: { value: 3, message: "name must be at least 3 characters" }
                             })}
                         />
-                        {errors.username && <p className="text-red-500 text-sm">{errors.username.message}</p>}
+                        {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
 
                         <input 
                             className="p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" 

@@ -18,7 +18,7 @@ model User {
   email     String     @unique
   password  String
   createdAt DateTime   @default(now())
-  username  String    @unique // Nombre de usuario
+  name  String     // Nombre de usuario
   updatedAt DateTime  @updatedAt
   links     Link[] // Relación con los enlaces creados por el usuario
   apiTokens ApiToken[] // Relación con los tokens API del usuario
@@ -32,7 +32,7 @@ model Link {
   qrCode          String? // Ruta o Base64 del código QR generado
   qrCodeGenerated Boolean     @default(false) // Indica si se generó un QR
   visits          Int         @default(0) // Contador de visitas
-  password        String? // Contraseña opcional para proteger el enlace
+  newLink        String       @unique // Enlace personalizado
   expirationDate  DateTime? // Fecha de expiración opcional
   createdAt       DateTime    @default(now())
   userId          String // Relación con el usuario
