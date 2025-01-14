@@ -1,5 +1,7 @@
+import { FlatCompat } from "@eslint/eslintrc";
+
+const compat = new FlatCompat();
+
 export default [
-  {
-    extends: ["next/core-web-vitals"],
-  },
+  compat.extends("next/core-web-vitals"),
 ];
