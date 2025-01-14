@@ -71,7 +71,7 @@ export default function LinksList({
               {showModal === index && (
                 <Modal
                   modalRef={modalRef}
-                  handleCopy={() => handleCopy(link.shortUrl)}
+                  handleCopy={() => handleCopy(link.newLink)}
                   setQrModal={() => setQrModal(index)}
                   closeModal={() => setShowModal(null)} // Pasa la función para cerrar el modal
                 />

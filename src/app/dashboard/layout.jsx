@@ -10,7 +10,7 @@ export default function DashboardLayout({ children }) {
 
     return (
         <div className="truncate font-mono">
-            <nav className="bg-[#0d1117] flex border-b border-gray-600">
+            <nav className="px-20 bg-[#0d1117] flex border-b border-gray-600">
                 <Link href="/dashboard/links">
                     <div
                         className={`px-5 py-2 cursor-pointer hover:text-gray-200 flex items-center ${

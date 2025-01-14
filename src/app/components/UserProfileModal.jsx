@@ -73,13 +73,17 @@ export default function UserProfileModal({ modalRef, closeModal, userName, email
             <span>Contact</span>
           </Link>
           <button
-            onClick={() => signOut({ callbackUrl: "/" })}
+            onClick={() => {
+              signOut({ callbackUrl: "/" });  // Asegura la redirección
+              closeModal(); // Cierra el modal al hacer logout
+            }}
             className="text-red-500 text-sm flex items-center gap-2 p-2 rounded-md hover:bg-gray-600"
             style={{ alignSelf: "flex-start" }}
           >
             <MdLogout />
             <span>Logout</span>
           </button>
+
         </div>
       </div>
     </>

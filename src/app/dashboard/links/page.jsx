@@ -21,6 +21,7 @@ export default function UserLinks() {
   const fetchLinks = async () => {
     try {
       const links = await fetchUserLinks();
+      console.log("Links fetched:", links); // Asegúrate de que newLink está incluido
       setLinks(links);
       setFilteredLinks(links);
     } catch (err) {
@@ -43,8 +44,8 @@ export default function UserLinks() {
     }
   }, [searchQuery, links]);
 
-  const handleCopy = (shortUrl) => {
-    navigator.clipboard.writeText(shortUrl);
+  const handleCopy = (newLink) => {
+    navigator.clipboard.writeText(newLink);
     alert("Copied to clipboard!");
   };
 

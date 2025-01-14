@@ -22,10 +22,10 @@ export default function Modal({ modalRef, handleCopy, setQrModal, closeModal }) 
   return (
     <div
       ref={modalRef}
-      className="absolute z-50 top-8 left-[-5px] bg-[#0d1117] border border-gray-600 rounded-md p-2 shadow-lg"
+      className="absolute z-50 top-5 left-[-5px] bg-[#0d1117] border border-gray-600 rounded-md p-2 shadow-lg"
     >
       <button
-        className="truncate font-mono w-full text-left px-1 py-1 text-sm text-white flex items-center space-x-2"
+        className="truncate font-mono w-full text-left py-[3.3px] px-[3px]  text-sm text-white flex items-center space-x-2"
         onClick={() => {
           handleCopy();
           closeModal(); // Cierra el modal después de copiar
@@ -35,7 +35,7 @@ export default function Modal({ modalRef, handleCopy, setQrModal, closeModal }) 
         <span>Copy to Clipboard</span>
       </button>
       <button
-        className="truncate font-mono w-full text-left px-1 py-1 text-sm text-white flex items-center space-x-2"
+        className="truncate font-mono w-full text-left py-[3.3px] px-[3px] text-sm text-white flex items-center space-x-2"
         onClick={() => {
           setQrModal();
           closeModal(); // Cierra el modal después de generar el QR

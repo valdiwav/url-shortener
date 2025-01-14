@@ -1,6 +1,7 @@
 export async function fetchUserLinks() {
     try {
       const response = await fetch("/api/userLinks");
+      
       if (!response.ok) {
         throw new Error("Error fetching user links");
       }

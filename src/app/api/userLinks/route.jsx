@@ -33,11 +33,13 @@ export async function GET(req) {
         createdAt: true,
         qrCode: true,
         visits: true,
+        newLink: true,
       },
       orderBy: {
         createdAt: "desc",
       },
     });
+    
 
     return new Response(JSON.stringify({ links }), { status: 200 });
   } catch (error) {

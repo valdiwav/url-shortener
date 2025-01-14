@@ -7,11 +7,15 @@ import { FaArrowRightLong } from "react-icons/fa6";
 import { useState, useRef } from "react";
 import UserProfileModal from "./UserProfileModal";
 
-export default function Header({ isLoggedIn, toggleSearch, userName, email }) {
+export default function Header({ isLoggedIn, toggleSearch, userName, email, refreshSession}) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const modalRef = useRef(null);
+  
 
-  const toggleModal = () => {
+  const toggleModal = async () => {
+    if (!isModalOpen) {
+      await refreshSession(); // Refresca la sesión al abrir el modal
+    }
     setIsModalOpen((prev) => !prev);
   };
 
@@ -22,7 +26,7 @@ export default function Header({ isLoggedIn, toggleSearch, userName, email }) {
   return (
     <div className="flex justify-between items-center w-full">
       {/* Título y estado Beta */}
-      <div className="flex items-center">
+      <div className="flex items-center px-20">
         <Link href="/" className="text-4xl font-extrabold text-white font-sans">
           LnKut
         </Link>
@@ -32,11 +36,11 @@ export default function Header({ isLoggedIn, toggleSearch, userName, email }) {
       </div>
 
       {/* Botones de búsqueda y sesión */}
-      <div className="flex items-center gap-6 relative">
+      <div className="flex items-center gap-6 relative px-20">
         <button
           onClick={toggleSearch}
           aria-label="Buscar"
-          className="w-8 h-8 bg-[#161b22] rounded-full flex items-center justify-center hover:bg-[#21262d]"
+          className="w-10 h-10 bg-[#161b22] rounded-full flex items-center justify-center hover:bg-[#21262d]"
         >
           <HiMagnifyingGlass />
         </button>
@@ -44,7 +48,7 @@ export default function Header({ isLoggedIn, toggleSearch, userName, email }) {
           <div className="flex items-center gap-2">
             <button
               onClick={toggleModal}
-              className="w-8 h-8 bg-[#161b22] rounded-full flex items-center justify-center hover:bg-[#21262d]"
+              className="w-10 h-10 bg-[#161b22] rounded-full flex items-center justify-center hover:bg-[#21262d]"
               aria-label="User Profile"
             >
               <CgProfile />

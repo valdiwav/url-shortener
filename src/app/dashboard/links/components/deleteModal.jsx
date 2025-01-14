@@ -10,7 +10,7 @@ export default function ConfirmDeleteModal({ shortUrl, onConfirm, onCancel }) {
       {/* Fondo oscuro detrás del modal */}
       <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center">
         {/* Modal */}
-        <div className="bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full z-50">
+        <div className="bg-[#0d1117] border border-gray-700 p-6 rounded-lg shadow-lg max-w-md w-full z-50">
           <h2 className="text-white text-lg font-bold mb-4">
             ¿Estás seguro de eliminar este enlace?
           </h2>
@@ -21,7 +21,7 @@ export default function ConfirmDeleteModal({ shortUrl, onConfirm, onCancel }) {
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            className="w-full p-2 bg-gray-700 text-gray-100 border border-gray-600 rounded-md mb-4"
+            className="w-full p-2 bg-[#0d1117] text-gray-100 border border-gray-600 rounded-md mb-4"
             placeholder="Escribe el shortUrl aquí"
           />
           <div className="flex justify-end gap-2">
@@ -32,7 +32,7 @@ export default function ConfirmDeleteModal({ shortUrl, onConfirm, onCancel }) {
               Cancelar
             </button>
             <button
-              className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-500"
+              className="px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-500"
               disabled={inputValue !== shortUrl} // Habilitar solo si el input coincide
               onClick={onConfirm}
             >
