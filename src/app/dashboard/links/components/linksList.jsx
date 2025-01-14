@@ -8,20 +8,21 @@ import { IoSettingsOutline } from "react-icons/io5";
 import { FaRegTrashAlt } from "react-icons/fa";
 import Modal from "./modal";
 import ConfirmDeleteModal from "./deleteModal";
+import EditLinkModal from "./linkSettingsModal"; // Importa el componente del modal de edición
 
 export default function LinksList({
   links,
   handleCopy,
+  setLinks,
   setQrModal,
   handleDeleteLink,
 }) {
-
+  
   const [showModal, setShowModal] = useState(null);
   const [deleteModalIndex, setDeleteModalIndex] = useState(null);
+  const [editModalIndex, setEditModalIndex] = useState(null); // Estado para controlar el modal de edición
+  const [destinationUrl, setDestinationUrl] = useState(""); // Estado para la URL de destino
   const modalRef = useRef();
-
-  // Función para obtener los enlaces del servidor
-   // Solo se ejecuta una vez al montar el componente
 
   const formatDate = (dbDate) => {
     const date = new Date(dbDate);
@@ -32,8 +33,47 @@ export default function LinksList({
     });
   };
 
+  const openEditModal = (index) => {
+    setEditModalIndex(index);
+    setDestinationUrl(links[index].url); // Inicializa con la URL actual del enlace
+  };
 
+  const closeEditModal = () => {
+    setEditModalIndex(null);
+    setDestinationUrl("");
+  };
 
+  const saveEditLink = async () => {
+    try {
+      const response = await fetch(`/api/updateLink`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          shortUrl: links[editModalIndex].shortUrl,
+          destinationUrl,
+        }),
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        alert(data.message);
+        // Aquí actualizas el estado en el padre para reflejar el cambio
+        const updatedLinks = [...links];
+        updatedLinks[editModalIndex].url = destinationUrl;  // Actualiza solo el enlace modificado
+        setLinks(updatedLinks);  // Asumiendo que pasas `setLinks` desde el componente padre
+        closeEditModal();
+      } else {
+        alert(data.message || "Error updating link.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Error updating link.");
+    }
+  };
+  
+  
+  
   return (
     <ul className="grid grid-cols-2 gap-4">
       {links.map((link, index) => (
@@ -76,7 +116,10 @@ export default function LinksList({
                   closeModal={() => setShowModal(null)} // Pasa la función para cerrar el modal
                 />
               )}
-              <button className="flex items-center cursor-pointer hover:text-gray-700">
+              <button
+                className="flex items-center cursor-pointer hover:text-gray-700"
+                onClick={() => openEditModal(index)}
+              >
                 <IoSettingsOutline className="text-base" />
               </button>
               <button
@@ -114,6 +157,15 @@ export default function LinksList({
           )}
         </li>
       ))}
+      {editModalIndex !== null && (
+        <EditLinkModal
+          shortUrl={links[editModalIndex].shortUrl}
+          destinationUrl={destinationUrl}
+          setDestinationUrl={setDestinationUrl}
+          onClose={closeEditModal}
+          onSave={saveEditLink}
+        />
+      )}
     </ul>
   );
 }

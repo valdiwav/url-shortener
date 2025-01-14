@@ -103,6 +103,7 @@ export default function UserLinks() {
       {error && <p className="text-red-500 text-center mb-4">{error}</p>}
       <LinksList
         links={filteredLinks}
+        setLinks={setLinks}  // Pasa la función setLinks para actualizar el estado
         handleCopy={handleCopy}
         setQrModal={setQrModal}
         handleDeleteLink={handleDeleteLink}

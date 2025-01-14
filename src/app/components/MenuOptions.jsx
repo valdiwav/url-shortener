@@ -1,20 +1,23 @@
 "use client";
 import { MdOutlineDashboard } from "react-icons/md";
 import { HiOutlineHome } from "react-icons/hi";
-import { MdLogout } from "react-icons/md";
 import { FaLink, FaGithub, FaLinkedin } from "react-icons/fa6";
 import { IoSettingsOutline } from "react-icons/io5";
+import { MdAlternateEmail } from "react-icons/md";
 import Link from "next/link";
 
 const options = {
   General: [
-    { name: "Dashboard", icon: <MdOutlineDashboard />, href: "/dashboard/links" },
+    { name: "Home", icon: <HiOutlineHome />, href: "/" },
     { name: "Links", icon: <FaLink />, href: "/dashboard/links" },
     { name: "Settings", icon: <IoSettingsOutline />, href: "/dashboard/settings" },
   ],
   Social: [
-    { name: "GitHub", icon: <FaGithub />, link: "https://github.com" },
-    { name: "LinkedIn", icon: <FaLinkedin />, link: "https://linkedin.com" },
+    { name: "Mail", icon: <MdAlternateEmail />, link: "mailto:valdivialvaro.8@gmail.com" },
+    { name: "LinkedIn", icon: <FaLinkedin />, link: "https://www.linkedin.com/in/alvaro-valdivia-miranda-a5065b178" },
+  ],
+  Repository: [
+    { name: "GitHub", icon: <FaGithub />, link: "https://github.com/valdiwav/url-shortener" },
   ],
 };
 

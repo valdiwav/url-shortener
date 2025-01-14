@@ -157,16 +157,17 @@ const handleUpdateUsername = async () => {
   {/* Modal para eliminar cuenta */}
   {showDeleteModal && (
     <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-gray-800 p-6 rounded-lg text-white">
+      <div className="bg-[#0d1117] border border-gray-700 p-6 rounded-lg text-white">
         <h2 className="text-xl font-bold mb-4">
           Are you sure you want to delete your account?
         </h2>
         <p>Please enter your email to confirm:</p>
         <input
           type="email"
+          placeholder="user@mail.com"
           value={confirmEmail}
           onChange={(e) => setConfirmEmail(e.target.value)}
-          className="w-full p-2 rounded bg-[#0d1117] text-white mt-2 mb-4"
+          className="w-full p-2 rounded border border-gray-700 hover:border-gray-500 bg-[#0d1117] text-white mt-2 mb-4"
         />
         <div className="flex justify-end">
           <button

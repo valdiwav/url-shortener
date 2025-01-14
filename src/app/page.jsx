@@ -51,18 +51,11 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Botón para iniciar sesión */}
-        <button
-          onClick={() => router.push("/auth/login")}
-          className="px-4 py-2 bg-[#238636] text-white rounded-md hover:bg-[#2ea043] transition-colors"
-        >
-          Create a Link
-        </button>
       </main>
 
       {/* Footer */}
-      <footer className="mt-6 text-center text-gray-500 text-xs">
-        © 2025 LnKut.
+      <footer className="mt-[150px] text-center text-gray-500 text-xs">
+        © 2025 LnKut | Made by Álvaro based on Slug front.
       </footer>
     </div>
   );
