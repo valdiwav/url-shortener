@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import db from "../../../libs/db";
+import db from "../../../libs/db"; // Asegúrate de usar rutas absolutas
 import bcrypt from "bcrypt";
 
 export const authOptions = {
@@ -37,7 +37,6 @@ export const authOptions = {
   ],
   callbacks: {
     async session({ session, token }) {
-      // Busca el usuario actualizado en la base de datos
       const user = await db.user.findUnique({
         where: {
           id: token.id,
@@ -46,7 +45,7 @@ export const authOptions = {
 
       if (user) {
         session.user.id = user.id;
-        session.user.name = user.name; // Devuelve el nombre actualizado
+        session.user.name = user.name;
         session.user.email = user.email;
       }
 
@@ -54,7 +53,7 @@ export const authOptions = {
     },
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id; // Guarda el ID en el token
+        token.id = user.id;
       }
       return token;
     },
