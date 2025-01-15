@@ -4,6 +4,7 @@ import db from "../libs/db";
 import bcrypt from "bcrypt";
 
 export const authOptions = {
+  debug: true,
   providers: [
     CredentialsProvider({
       name: "Credentials",
