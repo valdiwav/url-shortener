@@ -1,7 +1,7 @@
 // src/app/api/shortUrl/route.js
 import { PrismaClient } from "@prisma/client";
 import { generateQRCodeBase64 } from "../../components/qrCodeGenerator"; // Ajusta la ruta según tu estructura
-import { authOptions } from "../auth/[...nextauth]/route";
+import { authOptions } from "@/app/utils/authOptions";
 import { getServerSession } from "next-auth/next";
 
 

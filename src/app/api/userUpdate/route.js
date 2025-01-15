@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../auth/[...nextauth]/route";
+import { authOptions } from "@/app/utils/authOptions";
 import { PrismaClient } from "@prisma/client";
 
 // Instanciamos PrismaClient fuera de la función

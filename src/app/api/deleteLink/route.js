@@ -1,7 +1,7 @@
 // src/app/api/deleteLink/route.js
 import { PrismaClient } from "@prisma/client";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../auth/[...nextauth]/route"; // Ajusta la ruta si es necesario
+import { authOptions } from "@/app/utils/authOptions"; // Ajusta la ruta si es necesario
 
 const prisma = new PrismaClient();
 
