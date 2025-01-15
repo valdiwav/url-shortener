@@ -5,7 +5,7 @@ import SearchBar from "./components/searchBar";
 import LinksList from "./components/linksList";
 import QrCodeModal from "./components/QrCodeModal";
 import ShortUrlModal from "./components/urlShortenerModal";
-import { fetchUserLinks } from "../../utils/api";
+import { fetchUserLinks } from "@/utils/api";
 import { FaPlus } from "react-icons/fa6";
 import { BsBoxSeam } from "react-icons/bs";
 
