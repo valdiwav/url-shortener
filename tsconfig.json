@@ -1,5 +1,10 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/app/*": ["src/app/*"],
+      "@/utils/*": ["src/app/utils/*"]
+    },
     "target": "ES2017",
     "lib": [
       "dom",
@@ -28,7 +33,7 @@
   ".next/types/**/*.ts",
   "**/*.ts",
   "**/*.tsx",
-  "src/app/api/auth/[...nextauth]/route.ts"
+  "src/app/api/auth/[...nextauth]/route.js"
 , "src/app/utils/authOptions.js"  ],
   "exclude": [
     "node_modules"
