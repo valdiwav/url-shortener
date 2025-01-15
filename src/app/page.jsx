@@ -31,18 +31,18 @@ export default function Home() {
 
         {/* Demostración */}
         <div className="flex flex-col gap-3 w-full max-w-md bg-gray-800 p-4 rounded-md shadow-lg">
-          <h3 className="text-xl font-bold mb-2 text-white">Demo: Shorten a URL</h3>
+          <h3 className="text-xl font-bold mb-2 text-white">Shorten a URL</h3>
           <div className="flex flex-col gap-2">
             {/* Input Ficticio */}
             <input
-              value="https://example.com/very-long-url"
+              value="https://example.com/this-is-a-very-very-long-url-that-keeps-going-on-and-on-for-demonstration-purposes-only"
               readOnly
               className="p-2 bg-gray-700 border border-gray-600 rounded-md text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-not-allowed"
             />
             {/* Resultado */}
             <div className="mt-2 p-2 bg-gray-700 text-gray-100 rounded-md">
               <p>Shortened URL:</p>
-              <span className="text-blue-400 cursor-pointer">https://lnkut.io/demo123</span>
+              <span className="text-blue-400 cursor-pointer">https://lnkut.vercel.app/ext12</span>
             </div>
           </div>
           {/* Texto Explicativo */}

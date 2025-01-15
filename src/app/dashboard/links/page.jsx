@@ -67,8 +67,8 @@ export default function UserLinks() {
         alert(data.error);
       }
     } catch (error) {
-      console.error("Error al eliminar el enlace:", error);
-      alert("Hubo un error al intentar eliminar el enlace.");
+      console.error("Error deleting the link:", error);
+      alert("An error occurred while trying to delete the link.");
     }
   };
 
