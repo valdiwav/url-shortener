@@ -18,8 +18,13 @@ export default function Navbar() {
   // Función para alternar el modo oscuro
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
-    document.documentElement.classList.toggle("dark", !darkMode);
+    if (darkMode) {
+      document.documentElement.classList.remove("dark");
+    } else {
+      document.documentElement.classList.add("dark");
+    }
   };
+  
 
   const toggleSearch = () => {
     setIsSearchOpen(!isSearchOpen);
