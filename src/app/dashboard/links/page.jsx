@@ -80,7 +80,7 @@ export default function UserLinks() {
   };
 
   return (
-    <div className="truncate font-mono container mx-auto p-4">
+    <div className="truncate bg-[#0d1117] font-mono container mx-auto p-4">
       <div className="flex items-center justify-between mb-6">
         <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
         <div className="flex items-center space-x-4 truncate font-mono font-bold">
