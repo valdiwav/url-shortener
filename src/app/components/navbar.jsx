@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import { useSession, getSession } from "next-auth/react";
 import Header from "./Header";
@@ -6,7 +7,7 @@ import SearchModal from "./SearchModal";
 import MenuOptions from "./MenuOptions";
 
 export default function Navbar() {
-  const [darkMode, setDarkMode] = useState(true);
+  const [darkMode, setDarkMode] = useState(true); // Estado del modo oscuro
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [sessionData, setSessionData] = useState(null);
@@ -14,6 +15,7 @@ export default function Navbar() {
 
   const isLoggedIn = status === "authenticated";
 
+  // Función para alternar el modo oscuro
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
     document.documentElement.classList.toggle("dark", !darkMode);
@@ -38,12 +40,15 @@ export default function Navbar() {
   return (
     <>
       <nav className="bg-[#0d1117] p-4 flex justify-between items-center text-white">
+        {/* Pasamos darkMode y toggleDarkMode al Header */}
         <Header
           isLoggedIn={isLoggedIn}
           toggleSearch={toggleSearch}
           userName={sessionData?.user?.name || session?.user?.name || ""}
           email={sessionData?.user?.email || session?.user?.email || ""}
           refreshSession={refreshSession} // Pasa la función al header
+          darkMode={darkMode} // Nuevo: pasa el estado del modo oscuro
+          toggleDarkMode={toggleDarkMode} // Nuevo: pasa la función para alternar el modo oscuro
         />
       </nav>
 
