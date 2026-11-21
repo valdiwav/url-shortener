@@ -1,71 +1,51 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useSession, getSession } from "next-auth/react";
-import Header from "./Header";
-import SearchModal from "./SearchModal";
-import MenuOptions from "./MenuOptions";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { signOut, useSession } from "next-auth/react";
+import { LuArrowUpRight, LuLogOut } from "react-icons/lu";
+import Brand from "./Brand";
 
 export default function Navbar() {
-  const [darkMode, setDarkMode] = useState(true); // Estado del modo oscuro
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchText, setSearchText] = useState("");
-  const [sessionData, setSessionData] = useState(null);
-  const { data: session, status } = useSession();
-
-  const isLoggedIn = status === "authenticated";
-
-  // Función para alternar el modo oscuro
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-    if (darkMode) {
-      document.documentElement.classList.remove("dark");
-    } else {
-      document.documentElement.classList.add("dark");
-    }
-  };
-  
-
-  const toggleSearch = () => {
-    setIsSearchOpen(!isSearchOpen);
-    setSearchText("");
-  };
-
-  const refreshSession = async () => {
-    const updatedSession = await getSession(); // Refresca los datos de la sesión
-    setSessionData(updatedSession); // Actualiza el estado local
-  };
-
-  useEffect(() => {
-    if (status === "authenticated") {
-      refreshSession();
-    }
-  }, [status]);
+  const pathname = usePathname();
+  const { status } = useSession();
+  const signedIn = status === "authenticated";
+  const inAuth = pathname.startsWith("/auth/");
+  const inDashboard = pathname.startsWith("/dashboard");
 
   return (
-    <>
-      <nav className="bg-[#0d1117] p-4 flex justify-between items-center text-white">
-        {/* Pasamos darkMode y toggleDarkMode al Header */}
-        <Header
-          isLoggedIn={isLoggedIn}
-          toggleSearch={toggleSearch}
-          userName={sessionData?.user?.name || session?.user?.name || ""}
-          email={sessionData?.user?.email || session?.user?.email || ""}
-          refreshSession={refreshSession} // Pasa la función al header
-          darkMode={darkMode} // Nuevo: pasa el estado del modo oscuro
-          toggleDarkMode={toggleDarkMode} // Nuevo: pasa la función para alternar el modo oscuro
-        />
-      </nav>
-
-      {isSearchOpen && (
-        <SearchModal
-          searchText={searchText}
-          setSearchText={setSearchText}
-          toggleSearch={toggleSearch}
-        >
-          <MenuOptions searchText={searchText} onClose={toggleSearch} />
-        </SearchModal>
-      )}
-    </>
+    <header className="site-header">
+      <div className="frame header-inner">
+        <Brand />
+        {!inAuth && !inDashboard && (
+          <nav className="header-sections" aria-label="Secciones">
+            <Link href="/#acortar">Acortador</Link>
+            <Link href="/#herramientas">Herramientas</Link>
+          </nav>
+        )}
+        <nav className="header-actions" aria-label="Cuenta">
+          {signedIn ? (
+            inDashboard ? (
+              <button className="button button-quiet" onClick={() => signOut({ callbackUrl: "/" })}>
+                <LuLogOut aria-hidden="true" /> Salir
+              </button>
+            ) : (
+              <Link className="button button-dark button-small" href="/dashboard">
+                Mi panel <LuArrowUpRight aria-hidden="true" />
+              </Link>
+            )
+          ) : inAuth ? (
+            <Link className="button button-quiet" href="/">Volver al inicio</Link>
+          ) : (
+            <>
+              <Link className="header-login" href="/auth/login">Iniciar sesión</Link>
+              <Link className="button button-dark button-small" href="/auth/register">
+                Crear cuenta <LuArrowUpRight aria-hidden="true" />
+              </Link>
+            </>
+          )}
+        </nav>
+      </div>
+    </header>
   );
 }

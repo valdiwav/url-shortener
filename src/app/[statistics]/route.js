@@ -1,38 +1,27 @@
-import { PrismaClient } from "@prisma/client";
+import db from "../libs/db";
+import { httpUrl } from "../utils/linkUrl";
 
-const prisma = new PrismaClient();
-
-export async function GET(req, context) {
-  const params = await context.params; // Acceso dinámico y asincrónico a los parámetros
-
-  if (!params || !params.statistics) {
-    return new Response("Parámetro no proporcionado", { status: 400 });
-  }
-
-  const { statistics } = params;
+export async function GET(_request, { params }) {
+  const { statistics: slug } = await params;
 
   try {
-    // Buscar el enlace en la base de datos
-    const link = await prisma.link.findUnique({
-      where: { shortUrl: statistics },
+    const link = await db.link.update({
+      where: { shortUrl: slug },
+      data: { visits: { increment: 1 } },
+      select: { url: true },
     });
 
-    if (!link) {
-      return new Response("Enlace no encontrado", { status: 404 });
-    }
-
-    // Incrementar el contador de visitas
-    await prisma.link.update({
-      where: { shortUrl: statistics },
-      data: { visits: link.visits + 1 },
+    const destination = httpUrl(link.url);
+    if (destination) return new Response(null, {
+      status: 302,
+      headers: { Location: destination.href, "Cache-Control": "no-store" },
     });
-
-    // Redirigir al enlace original
-    return Response.redirect(link.url, 302); // Redirección temporal
   } catch (error) {
-    console.error("Error procesando la solicitud:", error);
-    return new Response("Error interno del servidor", { status: 500 });
-  } finally {
-    await prisma.$disconnect();
+    if (error.code !== "P2025") {
+      console.error("Error al resolver enlace:", error.code || error.name);
+      return new Response("No pudimos abrir el enlace.", { status: 500 });
+    }
   }
+
+  return new Response("Enlace no encontrado.", { status: 404 });
 }

@@ -1,49 +1,27 @@
 import { getServerSession } from "next-auth/next";
-import { PrismaClient } from "@prisma/client";
-import { authOptions } from "@/app/utils/authOptions";
+import db from "../../libs/db";
+import { authOptions } from "../../utils/authOptions";
 
-const prisma = new PrismaClient();
+export async function POST(request) {
+  try {
+    const session = await getServerSession(authOptions);
+    const userId = session?.user?.id;
+    if (!userId) return new Response("Inicia sesión.", { status: 401 });
 
-export async function POST(req) {
-    try {
-      const session = await getServerSession(authOptions);
-  
-      if (!session) {
-        return new Response("Unauthorized", { status: 401 });
-      }
-  
-      const { email } = await req.json();
-  
-      if (session.user.email !== email) {
-        return new Response("Email does not match", { status: 400 });
-      }
-  
-      // Eliminar todos los enlaces y registros relacionados con el usuario
-      await prisma.link.deleteMany({
-        where: {
-          userId: session.user.id,
-        },
-      });
-  
-      await prisma.apiToken.deleteMany({
-        where: {
-          userId: session.user.id,
-        },
-      });
-  
-      // Eliminar el usuario
-      await prisma.user.delete({
-        where: {
-          email: email,
-        },
-      });
-  
-      return new Response("User account deleted successfully", { status: 200 });
-    } catch (error) {
-      console.error("Error deleting user:", error);
-      return new Response(`Failed to delete account: ${error.message}`, { status: 500 });
-    } finally {
-      await prisma.$disconnect();
+    const body = await request.json().catch(() => null);
+    if (body?.email !== session.user.email) {
+      return new Response("El correo de confirmación no coincide.", { status: 400 });
     }
+
+    await db.$transaction([
+      db.statistic.deleteMany({ where: { link: { userId } } }),
+      db.link.deleteMany({ where: { userId } }),
+      db.apiToken.deleteMany({ where: { userId } }),
+      db.user.delete({ where: { id: userId } }),
+    ]);
+    return new Response("Cuenta eliminada.");
+  } catch (error) {
+    console.error("Error al eliminar cuenta:", error.code || error.name);
+    return new Response("No pudimos eliminar la cuenta.", { status: 500 });
   }
-  
+}

@@ -1,48 +1,27 @@
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/utils/authOptions";
-import { PrismaClient } from "@prisma/client";
+import db from "../../libs/db";
+import { authOptions } from "../../utils/authOptions";
+import { httpUrl } from "../../utils/linkUrl";
 
-// Instancia de PrismaClient
-const prisma = new PrismaClient();
-
-export async function POST(req) {
+export async function POST(request) {
   try {
     const session = await getServerSession(authOptions);
+    if (!session?.user?.id) return Response.json({ message: "Inicia sesión." }, { status: 401 });
 
-    if (!session) {
-      return new Response("Unauthorized", { status: 401 });
+    const body = await request.json().catch(() => null);
+    const destination = httpUrl(body?.destinationUrl);
+    if (!destination || typeof body?.shortUrl !== "string" || !body.shortUrl) {
+      return Response.json({ message: "El enlace y el destino deben ser válidos." }, { status: 400 });
     }
 
-    const { shortUrl, destinationUrl } = await req.json();
-
-    // Validar la URL utilizando el constructor URL
-    try {
-      new URL(destinationUrl); // Si no lanza error, la URL es válida
-    } catch (error) {
-      return new Response("Invalid URL format", { status: 400 });
-    }
-
-    // Buscar y actualizar el enlace
-    const updatedLink = await prisma.link.update({
-      where: {
-        shortUrl,
-      },
-      data: {
-        url: destinationUrl,
-      },
+    const updatedLink = await db.link.update({
+      where: { shortUrl: body.shortUrl, userId: session.user.id },
+      data: { url: destination.href },
     });
-
-    return new Response(JSON.stringify({ message: "Link updated successfully", updatedLink }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    return Response.json({ message: "Destino actualizado.", updatedLink });
   } catch (error) {
-    console.error("Error updating link:", error);
-
-    if (error.code === "P2025") {
-      return new Response("Link not found", { status: 404 });
-    }
-
-    return new Response("Failed to update link", { status: 500 });
+    if (error.code === "P2025") return Response.json({ message: "Enlace no encontrado." }, { status: 404 });
+    console.error("Error al editar enlace:", error.code || error.name);
+    return Response.json({ message: "No pudimos actualizar el destino." }, { status: 500 });
   }
 }

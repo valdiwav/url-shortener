@@ -1,62 +1,39 @@
 import CredentialsProvider from "next-auth/providers/credentials";
-import NextAuth from "next-auth";
-import db from "../libs/db";
 import bcrypt from "bcrypt";
+import db from "../libs/db";
 
 export const authOptions = {
-  debug: true,
   providers: [
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "text" },
-        password: { label: "Password", type: "password" },
+        email: { label: "Correo electrónico", type: "email" },
+        password: { label: "Contraseña", type: "password" },
       },
       async authorize(credentials) {
-        const userFound = await db.user.findUnique({
-          where: { email: credentials?.email },
-        });
-
-        if (!userFound) throw new Error("No user found");
-
-        const matchPassword = await bcrypt.compare(
-          credentials.password,
-          userFound.password
-        );
-
-        if (!matchPassword) throw new Error("Wrong password");
-
-        return {
-          id: userFound.id,
-          name: userFound.name,
-          email: userFound.email,
-        };
+        if (!credentials?.email || !credentials.password) return null;
+        const user = await db.user.findUnique({ where: { email: credentials.email } });
+        if (!user || !await bcrypt.compare(credentials.password, user.password)) return null;
+        return { id: user.id, name: user.name, email: user.email };
       },
     }),
   ],
   callbacks: {
     async session({ session, token }) {
+      if (!token.id) return null;
       const user = await db.user.findUnique({
         where: { id: token.id },
+        select: { id: true, name: true, email: true },
       });
-
-      if (user) {
-        session.user.id = user.id; // No habrá error aquí
-        session.user.name = user.name;
-        session.user.email = user.email;
-      }
-
+      if (!user) return null;
+      session.user = user;
       return session;
     },
     async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-      }
+      if (user) token.id = user.id;
       return token;
     },
   },
-  pages: {
-    signIn: "/auth/login",
-  },
+  pages: { signIn: "/auth/login" },
   secret: process.env.NEXTAUTH_SECRET,
 };
