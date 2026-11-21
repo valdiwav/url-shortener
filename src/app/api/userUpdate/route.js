@@ -1,33 +1,21 @@
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/utils/authOptions";
-import { PrismaClient } from "@prisma/client";
+import db from "../../libs/db";
+import { authOptions } from "../../utils/authOptions";
 
-// Instanciamos PrismaClient fuera de la función
-const prisma = new PrismaClient();
-
-export async function POST(req) {
+export async function POST(request) {
   try {
     const session = await getServerSession(authOptions);
+    if (!session?.user?.id) return new Response("Inicia sesión.", { status: 401 });
 
-    if (!session) {
-      return new Response("Unauthorized", { status: 401 });
+    const body = await request.json().catch(() => null);
+    const name = typeof body?.username === "string" ? body.username.trim() : "";
+    if (name.length < 3 || name.length > 100) {
+      return new Response("Ingresa un nombre de entre 3 y 100 caracteres.", { status: 400 });
     }
-
-    const { username } = await req.json();
-
-    // Actualizar el nombre del usuario
-    const updatedUser = await prisma.user.update({
-      where: {
-        email: session.user.email,
-      },
-      data: {
-        name: username,
-      },
-    });
-
-    return new Response("Username updated successfully", { status: 200 });
+    await db.user.update({ where: { id: session.user.id }, data: { name } });
+    return new Response("Nombre actualizado.");
   } catch (error) {
-    console.error("Error updating username:", error);
-    return new Response("Failed to update username", { status: 500 });
+    console.error("Error al actualizar perfil:", error.code || error.name);
+    return new Response("No pudimos actualizar el nombre.", { status: 500 });
   }
 }

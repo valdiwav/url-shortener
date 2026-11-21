@@ -1,34 +1,21 @@
-// /api/user/getCurrentUser.js
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/utils/authOptions";
-import { PrismaClient } from "@prisma/client";
+import db from "../../libs/db";
+import { authOptions } from "../../utils/authOptions";
 
-const prisma = new PrismaClient();
-
-export async function GET(req) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions);
+    if (!session?.user?.id) return new Response("Inicia sesión.", { status: 401 });
 
-    if (!session) {
-      return new Response("Unauthorized", { status: 401 });
-    }
-
-    const user = await prisma.user.findUnique({
-      where: {
-        email: session.user.email,
-      },
+    const user = await db.user.findUnique({
+      where: { id: session.user.id },
+      select: { id: true, email: true, name: true, createdAt: true, updatedAt: true },
     });
 
-    if (!user) {
-      return new Response("User not found", { status: 404 });
-    }
-
-    return new Response(JSON.stringify(user), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    if (!user) return new Response("Usuario no encontrado.", { status: 404 });
+    return Response.json(user);
   } catch (error) {
-    console.error("Error fetching user:", error);
-    return new Response("Failed to fetch user", { status: 500 });
+    console.error("Error al cargar perfil:", error.code || error.name);
+    return new Response("No pudimos cargar el perfil.", { status: 500 });
   }
 }

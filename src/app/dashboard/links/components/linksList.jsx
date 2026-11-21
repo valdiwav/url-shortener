@@ -1,171 +1,157 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import Link from "next/link";
-import { MdOutlineSignalCellularAlt } from "react-icons/md";
-import { LuCopy } from "react-icons/lu";
-import { IoSettingsOutline } from "react-icons/io5";
-import { FaRegTrashAlt } from "react-icons/fa";
-import Modal from "./modal";
-import ConfirmDeleteModal from "./deleteModal";
-import EditLinkModal from "./linkSettingsModal"; // Importa el componente del modal de edición
+import { useState } from "react";
+import QRCode from "qrcode";
+import { LuChartNoAxesColumnIncreasing, LuCopy, LuDownload, LuLink2, LuQrCode, LuSquarePen, LuTrash2 } from "react-icons/lu";
+import Dialog from "../../../components/Dialog";
+import { destinationUrl, displayLink, httpUrl } from "../../../utils/linkUrl";
 
-export default function LinksList({
-  links,
-  handleCopy,
-  setLinks,
-  setQrModal,
-  handleDeleteLink,
-}) {
-  
-  const [showModal, setShowModal] = useState(null);
-  const [deleteModalIndex, setDeleteModalIndex] = useState(null);
-  const [editModalIndex, setEditModalIndex] = useState(null); // Estado para controlar el modal de edición
-  const [destinationUrl, setDestinationUrl] = useState(""); // Estado para la URL de destino
-  const modalRef = useRef();
+const formatDate = new Intl.DateTimeFormat("es-CL", { dateStyle: "medium" });
 
-  const formatDate = (dbDate) => {
-    const date = new Date(dbDate);
-    return date.toLocaleDateString("en-US", {
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-    });
-  };
+export default function LinksList({ links, onChange }) {
+  const [active, setActive] = useState(null);
+  const [notice, setNotice] = useState("");
 
-  const openEditModal = (index) => {
-    setEditModalIndex(index);
-    setDestinationUrl(links[index].url); // Inicializa con la URL actual del enlace
-  };
-
-  const closeEditModal = () => {
-    setEditModalIndex(null);
-    setDestinationUrl("");
-  };
-
-  const saveEditLink = async () => {
+  async function copy(link) {
     try {
-      const response = await fetch(`/api/updateLink`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          shortUrl: links[editModalIndex].shortUrl,
-          destinationUrl,
-        }),
-      });
-  
-      const data = await response.json();
-  
-      if (response.ok) {
-        alert(data.message);
-        // Aquí actualizas el estado en el padre para reflejar el cambio
-        const updatedLinks = [...links];
-        updatedLinks[editModalIndex].url = destinationUrl;  // Actualiza solo el enlace modificado
-        setLinks(updatedLinks);  // Asumiendo que pasas `setLinks` desde el componente padre
-        closeEditModal();
-      } else {
-        alert(data.message || "Error updating link.");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      alert("Error updating link.");
+      await navigator.clipboard.writeText(link.newLink);
+      setNotice("Enlace copiado: " + displayLink(link.newLink));
+    } catch {
+      setNotice("No pudimos copiar. Abre el enlace y cópialo manualmente.");
     }
-  };
-  
-  
-  
+  }
+
+  async function showQr(link) {
+    try {
+      const qr = link.qrCode || await QRCode.toDataURL(link.newLink);
+      setActive({ kind: "qr", link, qr });
+    } catch {
+      setNotice("No pudimos generar el código QR.");
+    }
+  }
+
   return (
-    <ul className="grid grid-cols-2 gap-4">
-      {links.map((link, index) => (
-        <li
-          key={index}
-          className="border border-gray-700 rounded-lg py-1 px-4 relative text-white"
-        >
-          <div className="flex items-center justify-between">
-            <Link href={`/${link.shortUrl}`} legacyBehavior>
-              <a
-                className="truncate font-mono text-lg tracking-wider break-all cursor-pointer hover:dark:text-neutral-400"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <span>/</span>
-                {link.shortUrl}
-              </a>
-            </Link>
-            <div className="flex space-x-4 text-neutral-100 dark:text-neutral-100 relative">
-              <button className="flex items-center">
-                <MdOutlineSignalCellularAlt className="text-base" />
-                <span className="ml-1 text-sm tracking-wide truncate font-mono font-bold">
-                  {link.visits}
-                </span>
-                <span className="ml-1 text-sm tracking-wide truncate font-mono font-bold">
-                  clicks
-                </span>
-              </button>
-              <button
-                className="flex items-center cursor-pointer hover:text-gray-700"
-                onClick={() => setShowModal(showModal === index ? null : index)}
-              >
-                <LuCopy className="text-base" />
-              </button>
-              {showModal === index && (
-                <Modal
-                  modalRef={modalRef}
-                  handleCopy={() => handleCopy(link.newLink)}
-                  setQrModal={() => setQrModal(index)}
-                  closeModal={() => setShowModal(null)} // Pasa la función para cerrar el modal
-                />
-              )}
-              <button
-                className="flex items-center cursor-pointer hover:text-gray-700"
-                onClick={() => openEditModal(index)}
-              >
-                <IoSettingsOutline className="text-base" />
-              </button>
-              <button
-                className="flex items-center cursor-pointer hover:text-red-700"
-                onClick={() => setDeleteModalIndex(index)}
-              >
-                <FaRegTrashAlt className="text-base flex items-center" />
-              </button>
-            </div>
-          </div>
-          <Link href={link.url} legacyBehavior>
-            <a
-              className="truncate font-mono font-bold text-sm text-neutral-500 dark:text-neutral-400 cursor-pointer hover:text-gray-200 mt-1"
-              target="_blank"
-              rel="noopener noreferrer"
-              title={link.url}
-            >
-              {link.url.length > 45 ? `${link.url.slice(0, 45)}...` : link.url}
+    <>
+      <p role="status" className="copy-status">{notice}</p>
+      {links.length > 0 && (
+        <ul className="links-list">
+          {links.map((link) => {
+            const short = httpUrl(link.newLink)?.href || "/" + encodeURIComponent(link.shortUrl);
+            return (
+              <li className="workspace-card link-card" key={link.shortUrl}>
+                <div className="link-details">
+                  <span className="section-icon lilac"><LuLink2 aria-hidden="true" /></span>
+                  <div>
+                    <a className="link-short" href={short} target="_blank" rel="noopener noreferrer">{displayLink(short)}</a>
+                    <p className="link-destination" title={link.url}>{link.url}</p>
+                  </div>
+                </div>
+                <div className="link-meta">
+                  <span><LuChartNoAxesColumnIncreasing aria-hidden="true" /> {link.visits.toLocaleString("es-CL")} {link.visits === 1 ? "clic" : "clics"}</span>
+                  <time dateTime={link.createdAt}>{formatDate.format(new Date(link.createdAt))}</time>
+                </div>
+                <div className="link-actions">
+                  <Action icon={LuCopy} label="Copiar enlace" onClick={() => copy(link)} />
+                  <Action icon={LuQrCode} label="Ver código QR" onClick={() => showQr(link)} />
+                  <Action icon={LuSquarePen} label="Editar destino" onClick={() => setActive({ kind: "edit", link })} />
+                  <Action icon={LuTrash2} label="Eliminar enlace" onClick={() => setActive({ kind: "delete", link })} danger />
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+      {active?.kind === "qr" && (
+        <Dialog title="Código QR" onClose={() => setActive(null)}>
+          <p className="subtle">{displayLink(active.link.newLink)}</p>
+          <div className="qr-preview">
+            <img src={active.qr} width="148" height="148" alt="Código QR del enlace corto" />
+            <a className="button button-dark button-small" href={active.qr} download={active.link.shortUrl + "-qr.png"}>
+              <LuDownload aria-hidden="true" /> Descargar PNG
             </a>
-          </Link>
-          <div className="flex justify-end mt-0.5">
-            <p className="truncate font-mono font-bold text-sm tracking-wide text-neutral-500 dark:text-neutral-400">
-              {formatDate(link.createdAt)}
-            </p>
           </div>
-          {deleteModalIndex === index && (
-            <ConfirmDeleteModal
-              shortUrl={link.shortUrl}
-              onConfirm={() => {
-                handleDeleteLink(link.shortUrl);
-                setDeleteModalIndex(null);
-              }}
-              onCancel={() => setDeleteModalIndex(null)}
-            />
-          )}
-        </li>
-      ))}
-      {editModalIndex !== null && (
-        <EditLinkModal
-          shortUrl={links[editModalIndex].shortUrl}
-          destinationUrl={destinationUrl}
-          setDestinationUrl={setDestinationUrl}
-          onClose={closeEditModal}
-          onSave={saveEditLink}
+        </Dialog>
+      )}
+      {active && active.kind !== "qr" && (
+        <LinkEditor
+          active={active}
+          onClose={() => setActive(null)}
+          onSaved={(updatedUrl) => {
+            onChange(active.link.shortUrl, updatedUrl);
+            setNotice(updatedUrl ? "Destino actualizado." : "Enlace eliminado.");
+            setActive(null);
+          }}
         />
       )}
-    </ul>
+    </>
+  );
+}
+
+function Action({ icon: Icon, label, onClick, danger }) {
+  return (
+    <button type="button" className={danger ? "icon-button danger" : "icon-button"} title={label} aria-label={label} onClick={onClick}>
+      <Icon aria-hidden="true" />
+    </button>
+  );
+}
+
+function LinkEditor({ active, onClose, onSaved }) {
+  const { kind, link } = active;
+  const editing = kind === "edit";
+  const [url, setUrl] = useState(link.url);
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  async function submit(event) {
+    event.preventDefault();
+    if (busy) return;
+    setError("");
+    const destination = editing ? destinationUrl(url) : null;
+    if (editing && !destination) {
+      setError("Ingresa una URL válida.");
+      return;
+    }
+
+    setBusy(true);
+    try {
+      const response = editing
+        ? await fetch("/api/updateLink", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ shortUrl: link.shortUrl, destinationUrl: destination.href }),
+          })
+        : await fetch("/api/deleteLink?shortUrl=" + encodeURIComponent(link.shortUrl), { method: "DELETE" });
+      if (!response.ok) {
+        setError(editing ? "No pudimos actualizar el destino." : "No pudimos eliminar el enlace.");
+        return;
+      }
+      onSaved(destination?.href);
+    } catch {
+      setError("No pudimos conectar. Intenta de nuevo.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const closeWhenIdle = () => { if (!busy) onClose(); };
+  return (
+    <Dialog title={editing ? "Editar destino" : "Eliminar enlace"} onClose={closeWhenIdle}>
+      <p className="subtle">{editing ? displayLink(link.newLink) : "Este enlace dejará de redirigir al destino."}</p>
+      <form className="edit-form" onSubmit={submit}>
+        {editing && (
+          <label className="field-label">
+            URL de destino
+            <input className="text-field" inputMode="url" autoComplete="off" value={url} onChange={(event) => setUrl(event.target.value)} required />
+          </label>
+        )}
+        {error && <p className="form-error" role="alert">{error}</p>}
+        <div className="dialog-actions">
+          <button type="button" className="button button-outline button-small" onClick={onClose} disabled={busy}>Cancelar</button>
+          <button type="submit" className={"button button-small " + (editing ? "button-lime" : "button-danger")} disabled={busy}>
+            {busy ? "Guardando…" : editing ? "Guardar destino" : "Eliminar enlace"}
+          </button>
+        </div>
+      </form>
+    </Dialog>
   );
 }

@@ -1,54 +1,20 @@
-import { PrismaClient } from "@prisma/client";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/utils/authOptions";
+import db from "../../libs/db";
+import { authOptions } from "../../utils/authOptions";
 
-const prisma = new PrismaClient();
-
-export async function GET(req) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions);
+    if (!session?.user?.id) return Response.json({ error: "Inicia sesión." }, { status: 401 });
 
-    if (!session || !session.user || !session.user.email) {
-      return new Response(JSON.stringify({ error: "No autenticado" }), {
-        status: 401,
-      });
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      select: { id: true },
+    const links = await db.link.findMany({
+      where: { userId: session.user.id },
+      select: { url: true, shortUrl: true, createdAt: true, qrCode: true, visits: true, newLink: true },
+      orderBy: { createdAt: "desc" },
     });
-
-    if (!user) {
-      return new Response(JSON.stringify({ error: "User not found" }), {
-        status: 404,
-      });
-    }
-
-    const links = await prisma.link.findMany({
-      where: { userId: user.id },
-      select: {
-        url: true,
-        shortUrl: true,
-        createdAt: true,
-        qrCode: true,
-        visits: true,
-        newLink: true,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-    
-
-    return new Response(JSON.stringify({ links }), { status: 200 });
+    return Response.json({ links });
   } catch (error) {
-    console.error(error);
-    return new Response(
-      JSON.stringify({ error: "Internal server error" }),
-      { status: 500 }
-    );
-  } finally {
-    await prisma.$disconnect();
+    console.error("Error al cargar enlaces:", error.code || error.name);
+    return Response.json({ error: "No pudimos cargar tus enlaces." }, { status: 500 });
   }
 }

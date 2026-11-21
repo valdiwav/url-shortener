@@ -1,62 +1,74 @@
-"use client"; // Esto convierte el componente en un Client Component
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { LuArrowDown, LuArrowRight, LuChartNoAxesColumnIncreasing, LuCopy, LuGlobe, LuLink2, LuQrCode, LuSquarePen } from "react-icons/lu";
+import Brand from "./components/Brand";
+import Shortener from "./components/Shortener";
+
+const features = [
+  { icon: LuQrCode, title: "Códigos QR", description: "Descarga el QR de tu enlace para usarlo en carteles, presentaciones o tarjetas.", color: "lilac" },
+  { icon: LuChartNoAxesColumnIncreasing, title: "Conteo de clics", description: "Consulta cuántas veces se ha abierto cada enlace desde tu panel.", color: "lime" },
+  { icon: LuSquarePen, title: "Destinos editables", description: "Actualiza la URL de destino y sigue compartiendo el mismo enlace corto.", color: "peach" },
+];
 
 export default function Home() {
-  const router = useRouter();
-  useEffect(() => {
-    // Deshabilitar el scroll en la página
-    document.body.style.overflow = "hidden";
-
-    // Restaurar el scroll cuando el componente se desmonte
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, []);
-
   return (
-    <div className="min-h-screen bg-[#0d1117] text-gray-100 p-4 sm:p-10 font-sans">
-      <title>LnKut | Shorten Your URLs</title>
-
-      <main className="flex flex-col gap-6 items-center">
-        {/* Descripción Principal */}
-        <div className="text-center max-w-md">
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-2 text-gray-100">
-            Simplify Your Links with Style
-          </h2>
-          <p className="text-sm text-gray-400">
-            Discover how LnKut works! Below is a quick demo of our link-shortening magic.
-          </p>
-        </div>
-
-        {/* Demostración */}
-        <div className="flex flex-col gap-3 w-full max-w-md bg-gray-800 p-4 rounded-md shadow-lg">
-          <h3 className="text-xl font-bold mb-2 text-white">Shorten a URL</h3>
-          <div className="flex flex-col gap-2">
-            {/* Input Ficticio */}
-            <input
-              value="https://example.com/this-is-a-very-very-long-url-that-keeps-going-on-and-on-for-demonstration-purposes-only"
-              readOnly
-              className="p-2 bg-gray-700 border border-gray-600 rounded-md text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-not-allowed"
-            />
-            {/* Resultado */}
-            <div className="mt-2 p-2 bg-gray-700 text-gray-100 rounded-md">
-              <p>Shortened URL:</p>
-              <span className="text-blue-400 cursor-pointer">https://lnkut.vercel.app/ext12</span>
-            </div>
+    <>
+      <main className="frame">
+        <section className="hero" aria-labelledby="hero-title">
+          <div className="hero-copy">
+            <div className="eyebrow"><span /> ACORTADOR DE ENLACES</div>
+            <h1 id="hero-title">Acorta tus links.<br /><em>Compártelos mejor.</em></h1>
+            <p>Convierte cualquier URL en un enlace que da gusto compartir. Crea su QR y sigue los clics desde un mismo lugar.</p>
+            <a href="#acortar" className="hero-jump">Probar el acortador <LuArrowDown aria-hidden="true" /></a>
           </div>
-          {/* Texto Explicativo */}
-          <p className="text-sm text-gray-400 mt-2">
-            Once logged in, you can paste your own link and get a custom shortened URL. Try it out!
-          </p>
-        </div>
+          <figure className="hero-art" aria-label="Ejemplo. Una dirección larga se convierte en un enlace LnKut">
+            <div className="art-grid" aria-hidden="true" />
+            <div className="art-orbit art-orbit-one" aria-hidden="true" />
+            <div className="art-orbit art-orbit-two" aria-hidden="true" />
+            <span className="art-label">EJEMPLO DE ENLACE</span>
+            <div className="art-diagram" aria-hidden="true">
+              <div className="art-row art-origin">
+                <span className="art-icon"><LuGlobe /></span>
+                <div><small>URL ORIGINAL</small><strong>ejemplo.com/proyectos/coleccion</strong></div>
+              </div>
+              <div className="art-connector"><span><LuArrowDown /></span></div>
+              <div className="art-row art-result">
+                <span className="art-icon"><LuLink2 /></span>
+                <div><small>ENLACE CORTO</small><strong>lnkut.vercel.app/<b>m7vk2p</b></strong></div>
+                <LuCopy className="art-copy" />
+              </div>
+            </div>
+            <div className="art-spark" aria-hidden="true">✳</div>
+            <div className="art-corner" aria-hidden="true"><LuArrowRight /></div>
+          </figure>
+        </section>
 
+        <section className="shortener-panel" id="acortar" aria-labelledby="shortener-title">
+          <div className="shortener-intro">
+            <span className="section-icon lime"><LuLink2 aria-hidden="true" /></span>
+            <h2 id="shortener-title">Acorta un enlace</h2>
+          </div>
+          <Shortener />
+        </section>
+
+        <section id="herramientas" className="features" aria-labelledby="features-title">
+          <h2 id="features-title">Tus enlaces, bajo control.</h2>
+          <div className="features-grid">
+            {features.map(({ icon: Icon, title, description, color }) => (
+              <article className="feature" key={title}>
+                <span className={"section-icon " + color}><Icon aria-hidden="true" /></span>
+                <h3>{title}</h3>
+                <p>{description}</p>
+              </article>
+            ))}
+          </div>
+        </section>
       </main>
-
-      {/* Footer */}
-      <footer className="mt-[150px] text-center text-gray-500 text-xs">
-        © 2025 LnKut | Made by Álvaro based on Slug front.
+      <footer className="site-footer">
+        <div className="frame footer-inner">
+          <Brand />
+          <span>Hecho por Álvaro</span>
+          <a href="#acortar">Volver al acortador <LuArrowRight aria-hidden="true" /></a>
+        </div>
       </footer>
-    </div>
+    </>
   );
 }

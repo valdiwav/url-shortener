@@ -1,102 +1,56 @@
-// src/app/api/shortUrl/route.js
-import { PrismaClient } from "@prisma/client";
-import { generateQRCodeBase64 } from "../../components/qrCodeGenerator"; // Ajusta la ruta según tu estructura
-import { authOptions } from "@/app/utils/authOptions";
+import { randomBytes } from "node:crypto";
 import { getServerSession } from "next-auth/next";
+import { generateQRCodeBase64 } from "../../components/qrCodeGenerator";
+import db from "../../libs/db";
+import { authOptions } from "../../utils/authOptions";
+import { httpUrl } from "../../utils/linkUrl";
 
-
-const prisma = new PrismaClient();
-
-
-export async function POST(req) {
+export async function POST(request) {
   try {
-    const body = await req.json();
-    const { url } = body;
     const session = await getServerSession(authOptions);
-
-    // Validar que la URL exista
-    if (!url) {
-      return new Response(JSON.stringify({ error: "URL es requerida" }), {
-        status: 400,
-      });
+    if (!session?.user?.id) {
+      return Response.json({ error: "Inicia sesión para crear enlaces." }, { status: 401 });
     }
 
-    // Validar que la URL sea válida
-    const isValidUrl = (url) => {
+    const body = await request.json().catch(() => null);
+    const destination = httpUrl(body?.url);
+    if (!destination) {
+      return Response.json({ error: "Ingresa una URL HTTP o HTTPS válida." }, { status: 400 });
+    }
+
+    const productionHost = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+    const base = httpUrl(process.env.BASE_URL)
+      || (process.env.VERCEL_ENV === "production" && productionHost && httpUrl("https://" + productionHost))
+      || request.nextUrl;
+
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const shortUrl = randomBytes(4).toString("hex");
+      const newLink = new URL("/" + shortUrl, base.origin).href;
+      const qrCode = await generateQRCodeBase64(newLink);
+
       try {
-        new URL(url);
-        return true;
+        const link = await db.link.create({
+          data: {
+            url: destination.href,
+            shortUrl,
+            newLink,
+            qrCode,
+            qrCodeGenerated: true,
+            userId: session.user.id,
+          },
+        });
+        return Response.json({
+          originalUrl: link.url,
+          shortUrl: link.newLink,
+          newLink: link.newLink,
+          qrCode: link.qrCode,
+        }, { status: 201 });
       } catch (error) {
-        return false;
+        if (error.code !== "P2002" || attempt === 4) throw error;
       }
-    };
-
-    if (!isValidUrl(url)) {
-      return new Response(JSON.stringify({ error: "URL no válida" }), {
-        status: 400,
-      });
     }
-
-    // Generar un shortUrl único
-    let shortUrl;
-    let isUnique = false;
-
-    while (!isUnique) {
-      shortUrl = Math.random().toString(36).substring(2, 8);
-      const existing = await prisma.link.findUnique({
-        where: { shortUrl },
-      });
-      if (!existing) isUnique = true;
-    }
-
-    if (!session || !session.user || !session.user.email) {
-      throw new Error("El usuario no está autenticado o no se pudo obtener el email.");
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-    });
-
-    if (!user) {
-      throw new Error("Usuario no encontrado en la base de datos.");
-    }
-    const userId = user.id;
-
-
-    const baseUrl = process.env.BASE_URL || "http://localhost:3000";
-    const fullShortUrl = `${baseUrl}/${shortUrl}`;
-
-    // Generar el QR como Base64
-    const qrCode = await generateQRCodeBase64(fullShortUrl);
-
-    // Guardar en la base de datos
-    const savedUrl = await prisma.link.create({
-      data: {
-        url,
-        shortUrl,
-        qrCode, // Guardar el QR generado en Base64
-        qrCodeGenerated: true,
-        newLink: fullShortUrl,
-        userId, // Guardar el ID del usuario autenticado
-      },
-    });
-
-    return new Response(
-      JSON.stringify({
-        originalUrl: savedUrl.url,
-        shortUrl: fullShortUrl,
-        newLink: savedUrl.newLink,
-        qrCode: savedUrl.qrCode, // Enviar el QR generado al cliente
-      }),
-      { status: 201 }
-    );
   } catch (error) {
-    console.error("Error al guardar en la base de datos:", error);
-    return new Response(
-      JSON.stringify({ error: "Error interno del servidor" }),
-      { status: 500 }
-    );
-  } finally {
-    await prisma.$disconnect(); // Cierra la conexión de Prisma
+    console.error("Error al crear enlace:", error.code || error.name);
+    return Response.json({ error: "No pudimos crear el enlace. Intenta de nuevo." }, { status: 500 });
   }
 }
